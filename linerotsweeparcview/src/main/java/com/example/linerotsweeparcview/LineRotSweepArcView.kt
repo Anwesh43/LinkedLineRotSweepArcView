@@ -18,13 +18,14 @@ val colors : Array<Int> = arrayOf(
 ).map {
     Color.parseColor(it)
 }.toTypedArray()
-val parts : Int = 4
+val parts : Int = 5
 val scGap : Float = 0.02f / parts
 val strokeFactor : Float = 90f
 val sizeFactor : Float = 4.9f
 val delay : Long = 20
 val backColor : Int = Color.parseColor("#BDBDBD")
 val rot : Float = 180f
+val deg : Float = 30f
 
 fun Int.inverse() : Float = 1f / this
 fun Float.maxScale(i : Int, n : Int) : Float = Math.max(0f, this - i * n.inverse())
@@ -38,17 +39,17 @@ fun Canvas.drawLineRotSweepArc(scale : Float, w : Float, h : Float, paint : Pain
     val sf2 : Float = sf.divideScale(1, parts)
     val sf3 : Float = sf.divideScale(2, parts)
     val sf4 : Float = sf.divideScale(3, parts)
+    val sf5 : Float = sf.divideScale(4, parts)
     save()
     translate(w / 2, h / 2)
     rotate(rot * 0.5f * sf4)
     for (j in 0..1) {
         save()
-        scale(1f - 2 * j, 1f)
-        rotate((rot * sf2 + rot * 2 * sf3) * j)
-        drawLine(0f, 0f, size * sf1, 0f, paint)
+        rotate((rot * sf2 + rot * 2 * sf3) * j - deg * sf5 * (1f - 2 * j))
+        drawLine(0f, 0f, size * sf1 * (1f - 2 * j), 0f, paint)
         restore()
     }
-    drawArc(RectF(-size, -size, size, size), 0f, rot * 2 * sf3, false, paint)
+    drawArc(RectF(-size, -size, size, size), deg * sf5, rot * 2 * sf3 - 2 * deg * sf5, false, paint)
     restore()
 }
 
@@ -58,6 +59,7 @@ fun Canvas.drawLRSANode(i : Int, scale : Float, paint : Paint) {
     paint.color = colors[i]
     paint.strokeCap = Paint.Cap.ROUND
     paint.strokeWidth = Math.min(w, h) / strokeFactor
+    paint.style = Paint.Style.STROKE
     drawLineRotSweepArc(scale, w, h, paint)
 }
 
